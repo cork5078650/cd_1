@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill-Based Project Recommender</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">ProjectFinder</div>
+        <nav>
+            <ul>
+                <li><a href="About.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- 🔥 Hero Section with Background & Call-to-Action -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Find the Best Project Based on Your Skills</h1>
+            <p>Choose your skills, and we'll recommend the best projects for you.</p>
+            <a href="#skills" class="cta-button">Get Started</a>
+        </div>
+    </section>
+    
+    <!-- 🛠️ Skill Selection -->
+    <section id="skills" class="skill-selection">
+        <h2>Select Your Skills</h2>
+        <form id="skills-form">
+            <div class="skill-grid">
+                <label class="skill-item"><input type="checkbox" name="skill" value="HTML"> HTML</label>
+                <label class="skill-item"><input type="checkbox" name="skill" value="CSS"> CSS</label>
+                <label class="skill-item"><input type="checkbox" name="skill" value="JavaScript"> JavaScript</label>
+                <label class="skill-item"><input type="checkbox" name="skill" value="Python"> Python</label>
+                <label class="skill-item"><input type="checkbox" name="skill" value="React"> React</label>
+                <label class="skill-item"><input type="checkbox" name="skill" value="Node.js"> Node.js</label>
+                <label class="skill-item"><input type="checkbox" name="skill" value="SQL"> SQL</label>
+                <label class="skill-item"><input type="checkbox" name="skill" value="Machine Learning"> Machine Learning</label>
+            </div>
+            <button type="button" id="recommend-btn" class="btn">Get Projects</button>
+        </form>
+    </section>
+
+    <!-- 📋 Recommended Projects Section -->
+    <section id="projects">
+        <h2>Recommended Projects</h2>
+        <ul id="projects-list"></ul>
+    </section>
+
+    <!-- 📌 Footer -->
+    <footer>
+        <p>&copy; 2025 Project Finder. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
