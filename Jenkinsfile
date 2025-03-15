@@ -8,30 +8,32 @@ pipeline {
             }
         }
 
-        stage('Check Permissions') {
+        stage('List Files Before Docker Build') {
             steps {
-                // Checking the permissions of the Dockerfile
-                sh 'ls -l Dockerfile'
+                // This will list all files in the current directory (workspace)
+                sh 'echo "Listing files in the workspace before Docker build:"'
+                sh 'ls -alh'  // List all files in the current directory with details
             }
         }
 
-        stage('List Files Before Docker Build') {
+        stage('Check Permissions') {
             steps {
-                sh 'ls -alh'
+                // Checking the permissions of the Dockerfile
+                sh 'ls -l Dockerfile'  // List permissions of the Dockerfile (if it's in the root)
             }
         }
 
         stage('Check if Dockerfile Exists') {
             steps {
                 script {
-                    def dockerFileExists = fileExists 'docker/Dockerfile'
+                    def dockerFileExists = fileExists 'Dockerfile'
                     if (!dockerFileExists) {
-                        echo "docker/Dockerfile not found. Looking for Dockerfile in the root directory."
-                        dockerFileExists = fileExists 'Dockerfile'
+                        echo "Dockerfile not found in the root directory. Checking for other locations."
+                        dockerFileExists = fileExists 'docker/Dockerfile'  // Check subdirectory
                     }
 
                     if (dockerFileExists) {
-                        echo "Dockerfile found, proceeding with build."
+                        echo "Dockerfile found."
                     } else {
                         error "No Dockerfile found in the expected directories!"
                     }
@@ -42,19 +44,17 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def dockerFilePath = 'docker/Dockerfile'
-                    // Checking if Dockerfile exists in the specified folder
+                    def dockerFilePath = 'Dockerfile' // Default path (root directory)
+                    // If Dockerfile isn't in the root, check subdirectory
                     if (!fileExists(dockerFilePath)) {
-                        dockerFilePath = 'Dockerfile'  // fallback to root Dockerfile
+                        dockerFilePath = 'docker/Dockerfile'  // Update path if Dockerfile is inside a folder
                     }
 
-                    // If Dockerfile path is still not valid, throw an error
                     if (!fileExists(dockerFilePath)) {
                         error "No Dockerfile found in the expected directories!"
                     }
 
                     echo "Building Docker image using Dockerfile at ${dockerFilePath}"
-                    // Build the docker image using the correct Dockerfile path
                     sh "docker build -t my-static-website -f ${dockerFilePath} ."
                 }
             }
@@ -62,7 +62,9 @@ pipeline {
 
         stage('List Files After Docker Build') {
             steps {
-                sh 'ls -alh'
+                // This will list all files in the workspace after the Docker build
+                sh 'echo "Listing files in the workspace after Docker build:"'
+                sh 'ls -alh'  // List all files in the current directory with details
             }
         }
 
