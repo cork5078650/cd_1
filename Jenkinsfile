@@ -10,20 +10,21 @@ pipeline {
         
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t my-static-website .'
+                sh 'docker build -t my-static-website -f docker/Dockerfile .'
             }
         }
-        stage('List Files') {
-    steps {
-        sh 'ls -alh'
-    }
-}
-stage('Check Docker Version') {
-    steps {
-        sh 'docker --version'
-    }
-}
 
+        stage('List Files') {
+            steps {
+                sh 'ls -alh'
+            }
+        }
+
+        stage('Check Docker Version') {
+            steps {
+                sh 'docker --version'
+            }
+        }
 
         stage('Run Container') {
             steps {
