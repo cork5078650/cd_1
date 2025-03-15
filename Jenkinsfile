@@ -8,6 +8,13 @@ pipeline {
             }
         }
 
+        stage('Check Permissions') {
+            steps {
+                // Checking the permissions of the Dockerfile
+                sh 'ls -l Dockerfile'
+            }
+        }
+
         stage('List Files Before Docker Build') {
             steps {
                 sh 'ls -alh'
