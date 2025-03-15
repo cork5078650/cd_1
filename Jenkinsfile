@@ -8,6 +8,12 @@ pipeline {
             }
         }
         
+        stage('List Files Before Docker Build') {
+            steps {
+                sh 'ls -alh'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t my-static-website -f docker/Dockerfile .'
