@@ -7,16 +7,40 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/cork5078650/cd_1.git'
             }
         }
-        
+
         stage('List Files Before Docker Build') {
             steps {
                 sh 'ls -alh'
             }
         }
 
+        stage('Check if Dockerfile Exists') {
+            steps {
+                script {
+                    def dockerFileExists = fileExists 'docker/Dockerfile'
+                    if (!dockerFileExists) {
+                        echo "docker/Dockerfile not found. Looking for Dockerfile in the root directory."
+                        dockerFileExists = fileExists 'Dockerfile'
+                    }
+
+                    if (dockerFileExists) {
+                        echo "Dockerfile found, proceeding with build."
+                    } else {
+                        error "No Dockerfile found in the expected directories!"
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t my-static-website -f docker/Dockerfile .'
+                script {
+                    def dockerFilePath = 'docker/Dockerfile'
+                    if (!fileExists(dockerFilePath)) {
+                        dockerFilePath = 'Dockerfile'  // fallback to root Dockerfile
+                    }
+                    sh "docker build -t my-static-website -f ${dockerFilePath} ."
+                }
             }
         }
 
