@@ -36,17 +36,24 @@ pipeline {
             steps {
                 script {
                     def dockerFilePath = 'docker/Dockerfile'
-                    // Checking if Dockerfile exists in the specified folder or root
+                    // Checking if Dockerfile exists in the specified folder
                     if (!fileExists(dockerFilePath)) {
                         dockerFilePath = 'Dockerfile'  // fallback to root Dockerfile
                     }
-                    // Add the correct path to the build command
+
+                    // If Dockerfile path is still not valid, throw an error
+                    if (!fileExists(dockerFilePath)) {
+                        error "No Dockerfile found in the expected directories!"
+                    }
+
+                    echo "Building Docker image using Dockerfile at ${dockerFilePath}"
+                    // Build the docker image using the correct Dockerfile path
                     sh "docker build -t my-static-website -f ${dockerFilePath} ."
                 }
             }
         }
 
-        stage('List Files') {
+        stage('List Files After Docker Build') {
             steps {
                 sh 'ls -alh'
             }
