@@ -1,83 +1,116 @@
 pipeline {
     agent any
-
+    
+    environment {
+        // Define any environment variables if needed
+        REPO_URL = 'https://github.com/cork5078650/cd_1.git'
+        BRANCH_NAME = 'master'  // Replace 'master' with the correct branch name
+    }
+    
     stages {
+        stage('Checkout SCM') {
+            steps {
+                script {
+                    // Checkout from the specified branch
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: "*/${BRANCH_NAME}"]], // Change the branch name if needed
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[url: REPO_URL]]
+                    ])
+                }
+            }
+        }
+        
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/cork5078650/cd_1.git'
+                script {
+                    // Clone repository to the workspace
+                    git url: REPO_URL, branch: BRANCH_NAME
+                }
             }
         }
-
+        
         stage('List Files Before Docker Build') {
             steps {
-                // This will list all files in the current directory (workspace)
-                sh 'echo "Listing files in the workspace before Docker build:"'
-                sh 'ls -alh'  // List all files in the current directory with details
+                script {
+                    // List the files before Docker build starts
+                    echo 'Listing files in the workspace before Docker build:'
+                    sh 'ls -alh'
+                }
             }
         }
-
+        
         stage('Check Permissions') {
             steps {
-                // Checking the permissions of the Dockerfile
-                sh 'ls -l Dockerfile'  // List permissions of the Dockerfile (if it's in the root)
+                script {
+                    // Check the permissions of the Dockerfile if it exists
+                    sh 'ls -l Dockerfile'
+                }
             }
         }
 
         stage('Check if Dockerfile Exists') {
             steps {
                 script {
-                    def dockerFileExists = fileExists 'Dockerfile'
-                    if (!dockerFileExists) {
-                        echo "Dockerfile not found in the root directory. Checking for other locations."
-                        dockerFileExists = fileExists 'docker/Dockerfile'  // Check subdirectory
-                    }
-
-                    if (dockerFileExists) {
-                        echo "Dockerfile found."
-                    } else {
-                        error "No Dockerfile found in the expected directories!"
+                    // Check if the Dockerfile exists
+                    def dockerfileExists = fileExists('Dockerfile')
+                    if (!dockerfileExists) {
+                        error "Dockerfile does not exist!"
                     }
                 }
             }
         }
-
+        
         stage('Build Docker Image') {
             steps {
                 script {
-                    def dockerFilePath = 'Dockerfile' // Default path (root directory)
-                    // If Dockerfile isn't in the root, check subdirectory
-                    if (!fileExists(dockerFilePath)) {
-                        dockerFilePath = 'docker/Dockerfile'  // Update path if Dockerfile is inside a folder
-                    }
-
-                    if (!fileExists(dockerFilePath)) {
-                        error "No Dockerfile found in the expected directories!"
-                    }
-
-                    echo "Building Docker image using Dockerfile at ${dockerFilePath}"
-                    sh "docker build -t my-static-website -f ${dockerFilePath} ."
+                    // Build Docker image only if Dockerfile exists
+                    sh 'docker build -t myapp .'
                 }
             }
         }
-
+        
         stage('List Files After Docker Build') {
             steps {
-                // This will list all files in the workspace after the Docker build
-                sh 'echo "Listing files in the workspace after Docker build:"'
-                sh 'ls -alh'  // List all files in the current directory with details
+                script {
+                    // List the files after Docker build to check the changes
+                    echo 'Listing files in the workspace after Docker build:'
+                    sh 'ls -alh'
+                }
             }
         }
 
         stage('Check Docker Version') {
             steps {
-                sh 'docker --version'
+                script {
+                    // Check Docker version
+                    sh 'docker --version'
+                }
             }
         }
-
+        
         stage('Run Container') {
             steps {
-                sh 'docker run -d -p 8080:80 --name static-site my-static-website'
+                script {
+                    // Run the container after the image is built
+                    sh 'docker run -d -p 8080:80 myapp'
+                }
             }
+        }
+    }
+    
+    post {
+        always {
+            // Clean up or additional steps that should always run
+            echo 'Pipeline completed.'
+        }
+        success {
+            echo 'Pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
