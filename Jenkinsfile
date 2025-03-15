@@ -13,6 +13,17 @@ pipeline {
                 sh 'docker build -t my-static-website .'
             }
         }
+        stage('List Files') {
+    steps {
+        sh 'ls -alh'
+    }
+}
+stage('Check Docker Version') {
+    steps {
+        sh 'docker --version'
+    }
+}
+
 
         stage('Run Container') {
             steps {
