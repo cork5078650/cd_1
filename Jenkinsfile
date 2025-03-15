@@ -36,9 +36,11 @@ pipeline {
             steps {
                 script {
                     def dockerFilePath = 'docker/Dockerfile'
+                    // Checking if Dockerfile exists in the specified folder or root
                     if (!fileExists(dockerFilePath)) {
                         dockerFilePath = 'Dockerfile'  // fallback to root Dockerfile
                     }
+                    // Add the correct path to the build command
                     sh "docker build -t my-static-website -f ${dockerFilePath} ."
                 }
             }
