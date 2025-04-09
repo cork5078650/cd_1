@@ -2,7 +2,8 @@
 FROM nginx:alpine
 
 # Set the working directory inside the container
-COPY website /usr/share/nginx/html
+COPY website /usr/share/nginx/website
+
 
 
 # Copy the contents of the current directory to the container's working directory
